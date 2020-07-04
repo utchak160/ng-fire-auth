@@ -45,8 +45,12 @@ export class AuthService implements OnInit{
   signUp(email, password) {
     return this.afAuth.createUserWithEmailAndPassword(email, password)
       .then((res) => {
-        this.sendEmailVerification();
-        this.setUserData(res.user);
+        this.sendEmailVerification().then(() => {
+          window.alert('Verification Email sent. Check your inbox!');
+        });
+        this.setUserData(res.user).then(() => {
+          localStorage.setItem(Constants.USER_DETAILS, JSON.stringify(this.userData));
+        });
       }).catch((err) => {
         window.alert(err.message);
       })
@@ -89,7 +93,7 @@ export class AuthService implements OnInit{
         this.ngZone.run(() => {
           this.router.navigate(['dashboard']);
         })
-        this.setUserData(res.user);
+        this.setUserData(res.user).then(r => console.log(r));
       }).catch(err => {
         window.alert(err.message);
       })
@@ -105,6 +109,7 @@ export class AuthService implements OnInit{
       photoURL: user.photoURL,
       emailVerified: user.emailVerified
     }
+    localStorage.setItem(Constants.USER_DETAILS, JSON.stringify(user));
     return userRef.set(userData, {
       merge: true
     })
