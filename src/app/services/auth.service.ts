@@ -9,7 +9,7 @@ import {auth} from "firebase";
 @Injectable({
   providedIn: "root"
 })
-export class AuthService implements OnInit{
+export class AuthService implements OnInit {
   userData: any;
 
   constructor(public afs: AngularFirestore,
@@ -17,6 +17,7 @@ export class AuthService implements OnInit{
               private router: Router,
               public ngZone: NgZone) {
   }
+
   ngOnInit() {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
@@ -38,8 +39,8 @@ export class AuthService implements OnInit{
         });
         this.setUserData(res.user);
       }).catch((error) => {
-      window.alert(error.message);
-    });
+        window.alert(error.message);
+      });
   }
 
   signUp(email, password) {
@@ -87,6 +88,14 @@ export class AuthService implements OnInit{
     return this.AuthLogin(new auth.FacebookAuthProvider());
   }
 
+  githubAuth() {
+    return this.AuthLogin(new auth.GithubAuthProvider());
+  }
+
+  phoneNumberAuth() {
+    return this.AuthLogin(new auth.PhoneAuthProvider());
+  }
+
   AuthLogin(provider) {
     return this.afAuth.signInWithPopup(provider)
       .then((res) => {
@@ -109,7 +118,7 @@ export class AuthService implements OnInit{
       photoURL: user.photoURL,
       emailVerified: user.emailVerified
     }
-    localStorage.setItem(Constants.USER_DETAILS, JSON.stringify(user));
+    localStorage.setItem(Constants.USER_DETAILS, JSON.stringify(this.userData));
     return userRef.set(userData, {
       merge: true
     })
